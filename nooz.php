@@ -6,10 +6,12 @@ Plugin URI: http://mightydev.com/nooz/
 Description: Simplified press release and media coverage management for corporate websites.
 Author: Mighty Digital
 Author URI: http://mightydigital.com
-Version: 0.2.0
+Version: 0.3.0
 */
 
 include __DIR__ . '/inc/wpalchemy/Page.php';
+
+include __DIR__ . '/inc/wpalchemy/Notice.php';
 
 $nooz = new Nooz;
 
@@ -37,7 +39,14 @@ class Nooz
 			'target' => '_blank',
 		);
 
-		$this->settings = array_merge( $this->default_settings, get_option( 'nooz_options', array() ) );
+		$this->settings = get_option( $this->option_name, array() );
+
+		if ( ! isset( $this->settings['release_slug'] ) ) {
+			$this->settings['release_slug'] = $this->default_settings['release_slug'];
+			update_option( $this->option_name, $this->settings );
+		}
+
+		$this->settings = array_merge( $this->default_settings, $this->settings );
 	}
 
 	public function init()
@@ -57,7 +66,51 @@ class Nooz
 
 		$this->setupShortcode();
 
-		//$this->setupDefaultPages();
+		$this->promptDefaultPages();
+	}
+
+	public function promptDefaultPages()
+	{
+		$option = 'nooz_default_pages';
+		$option_val = get_option( $option );
+		if ( false === $option_val ) {
+			if ( isset( $_GET[$option] ) ) {
+				update_option( $option, $_GET[$option] );
+				if ( 1 == $_GET[$option] ) {
+					add_action( 'admin_init', array ( $this, 'createDefaultPages' ) );
+				}
+			} else {
+				$url = admin_url( 'edit.php?post_status=draft&post_type=page&' . $option . '=' );
+				$message = sprintf( __( 'Create default press pages? Yes, <a href="%s">create pages</a>. No, <a href="%s">dismiss</a>.', 'nooz' ), $url . 1, $url . 0 );
+				new \WPAlchemy\Notice( $message, 'update-nag', 'edit_pages' );
+			}
+		}
+	}
+
+	public function createDefaultPages()
+	{
+		$format = "<h2>%s</h2>\n[nooz-release]\n<p><a href=\"/news/press-releases/\">%s</a></p>\n<h2>%s</h2>\n[nooz-coverage]\n<p><a href=\"/news/coverage\">%s</a></p>";
+		$args = array ( __( 'Press Releases', 'nooz' ), __( 'More press releases ...', 'nooz' ), __( 'Press Coverage', 'nooz' ), __( 'More press coverage ...', 'nooz' ) );
+		$post_id = wp_insert_post( array (
+			'post_content' => vsprintf( $format, $args ),
+			'post_title' => __( 'News', 'nooz' ),
+			'post_name' => 'news',
+			'post_type' => 'page',
+		) );
+		wp_insert_post( array (
+			'post_content' => '[nooz-release count="*"]',
+			'post_title' => __( 'Press Releases', 'nooz' ),
+			'post_name' => 'press-releases',
+			'post_type' => 'page',
+			'post_parent' => $post_id,
+		) );
+		wp_insert_post( array (
+			'post_content' => '[nooz-coverage count="*"]',
+			'post_title' => __( 'Press Coverage', 'nooz' ),
+			'post_name' => 'press-coverage',
+			'post_type' => 'page',
+			'post_parent' => $post_id,
+		) );
 	}
 
 	public function flushRewriteRules()
@@ -73,11 +126,6 @@ class Nooz
 		if ( $this->option_name == $option ) {
 			update_option( 'nooz_options_changed', true );
 		}
-	}
-
-	public function setupDefaultPages()
-	{
-		// setup draft pages
 	}
 
 	public function setupContentFilter()
@@ -161,35 +209,24 @@ class Nooz
 		$labels = array(
 			'name'               => _x( 'Press Releases', 'post type general name', 'nooz' ),
 			'singular_name'      => _x( 'Press Release', 'post type singular name', 'nooz' ),
-			//'menu_name'          => _x( 'Wraps3', 'admin menu', 'nooz' ),
-			//'name_admin_bar'     => _x( 'Wrap', 'add new on admin bar', 'nooz' ),
-			'add_new'            => _x( 'Add New', 'wrap', 'nooz' ),
+			'add_new'            => _x( 'Add New', 'press release', 'nooz' ),
 			'add_new_item'       => __( 'Add New Press Release', 'nooz' ),
 			'new_item'           => __( 'New Page', 'nooz' ),
-			'edit_item'          => __( 'Edit Release', 'nooz' ),
-			'view_item'          => __( 'View Release', 'nooz' ),
+			'edit_item'          => __( 'Edit Press Release', 'nooz' ),
+			'view_item'          => __( 'View Press Release', 'nooz' ),
 			'all_items'          => __( 'All Releases', 'nooz' ),
-			'search_items'       => __( 'Search Pages', 'nooz' ),
-			'parent_item_colon'  => __( 'Parent Pages:', 'nooz' ),
-			'not_found'          => __( 'No pages found.', 'nooz' ),
-			'not_found_in_trash' => __( 'No pages found in Trash.', 'nooz' )
+			'not_found'          => __( 'No press releases found.', 'nooz' ),
+			'not_found_in_trash' => __( 'No press releases found in Trash.', 'nooz' )
 		);
 		$args = array(
 			'labels'             => $labels,
 			'public'             => true,
-			//'has_archive'        => false
-			// show_ui=true because CPT are not editable if show_ui=false
+			// show_ui=true (default) because CPT are not editable if show_ui=false
 			// https://core.trac.wordpress.org/browser/tags/4.0.1/src/wp-admin/post-new.php#L14
 			// https://core.trac.wordpress.org/browser/trunk/src/wp-admin/post-new.php#L14
-			//'show_ui'            => true,
 			'show_in_menu'       => 'nooz',
 			'show_in_admin_bar'  => true,
-			//'rewrite'            => false,
 			'rewrite'            => array( 'slug' => $this->settings['release_slug'], 'with_front' => false ),
-			//'capability_type'    => 'post',
-			//'menu_position'      => null,
-			//'show_in_nav_menus'  => false, // show in Appearance > Menus
-			//'menu_icon'          => 'dashicons-megaphone',
 			'supports'           => array( 'title', 'editor', 'author', 'revisions' )
 		);
 		register_post_type( 'nooz_release', $args );
@@ -197,16 +234,12 @@ class Nooz
 		$labels = array(
 			'name'               => _x( 'Press Coverage', 'press coverage', 'nooz' ),
 			'singular_name'      => _x( 'Press Coverage', 'press coverage', 'nooz' ),
-			//'menu_name'          => _x( 'Wraps3', 'admin menu', 'nooz' ),
-			//'name_admin_bar'     => _x( 'Wrap', 'add new on admin bar', 'nooz' ),
 			'add_new'            => _x( 'Add New', 'press coverage', 'nooz' ),
 			'add_new_item'       => __( 'Add New Press Coverage', 'nooz' ),
 			'new_item'           => __( 'New Press Coverage', 'nooz' ),
 			'edit_item'          => __( 'Edit Coverage', 'nooz' ),
 			'view_item'          => __( 'View Coverage', 'nooz' ),
 			'all_items'          => __( 'All Coverage', 'nooz' ),
-			//'search_items'       => __( 'Search Pages', 'nooz' ),
-			//'parent_item_colon'  => __( 'Parent Pages:', 'nooz' ),
 			'not_found'          => __( 'No press coverage found.', 'nooz' ),
 			'not_found_in_trash' => __( 'No press coverage found in Trash.', 'nooz' )
 		);
@@ -217,9 +250,6 @@ class Nooz
 			'show_in_menu'       => 'nooz',
 			'show_in_admin_bar'  => true,
 			'rewrite'            => false,
-			//'capability_type'    => 'post',
-			//'menu_position'      => null,
-			//'menu_icon'          => 'dashicons-megaphone',
 			'supports'           => array( 'title', 'revisions' )
 		);
 		register_post_type( 'nooz_coverage', $args );
