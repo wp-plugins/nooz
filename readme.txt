@@ -2,8 +2,8 @@
 Contributors: mightydigital, farinspace
 Tags: press, news, media, press release, news coverage, media coverage, corporate, business
 Requires at least: 3.5
-Tested up to: 4.0.1
-Stable tag: 0.3.0
+Tested up to: 4.1.1
+Stable tag: 0.4.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,11 @@ If you've downloaded the latest plugin files:
 3. Custom section for external press coverage
 
 == Changelog ==
+
+= 0.4.0 =
+* better plugin internals
+* revised autoloader prevents interference with our other plugins
+* added uninstall
 
 = 0.3.0 =
 * prompt editor role (and up) to create default press pages
