@@ -301,10 +301,10 @@ class Nooz
 
 		extract( shortcode_atts( $default_atts, $atts ) );
 
-		$type = 'nooz_release';
-
 		if ( stristr( $type, 'coverage' ) ) {
 			$type = 'nooz_coverage';
+		} else {
+			$type = 'nooz_release';
 		}
 
 		if ('*' == $count) {

@@ -3,7 +3,7 @@ Contributors: mightydigital, farinspace
 Tags: press, news, media, press release, news coverage, media coverage, corporate, business
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,11 +28,6 @@ The press coverage page shows all available press coverage (these are links to e
 The plugin also exposes the following shortcodes: '[nooz-release]' and '[nooz-coverage]'. These shortcodes allow you to
 insert press release and press coverage lists on a page.
 
-= Coming soon =
-* Fine-grained control when editing a press release
-* Default set of styles for press releases and coverage pages
-* If you have ideas to enhance the plugin, let us know!
-
 == Installation ==
 
 The easiest way to install the plugin is to:
@@ -56,6 +51,9 @@ If you've downloaded the latest plugin files:
 3. Custom section for external press coverage
 
 == Changelog ==
+
+= 0.4.1 =
+* fixed issue with news coverage display
 
 = 0.4.0 =
 * better plugin internals
