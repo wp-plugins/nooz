@@ -6,7 +6,7 @@ Plugin URI: http://mightydev.com/nooz/
 Description: Simplified press release and media coverage management for corporate websites.
 Author: Mighty Digital
 Author URI: http://mightydigital.com
-Version: 0.4.1
+Version: 0.4.2
 */
 
 require_once __DIR__ . '/inc/autoload.php';

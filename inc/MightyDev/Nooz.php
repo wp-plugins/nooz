@@ -95,7 +95,7 @@ class Nooz
 #
 	public function create_default_pages()
 	{
-		$format = "<h2>%s</h2>\n[nooz-release]\n<p><a href=\"/news/press-releases/\">%s</a></p>\n<h2>%s</h2>\n[nooz-coverage]\n<p><a href=\"/news/coverage\">%s</a></p>";
+		$format = "<h2>%s</h2>\n[nooz-release]\n<p><a href=\"/news/press-releases/\">%s</a></p>\n<h2>%s</h2>\n[nooz-coverage]\n<p><a href=\"/news/press-coverage\">%s</a></p>";
 		$args = array ( __( 'Press Releases', 'nooz' ), __( 'More press releases ...', 'nooz' ), __( 'Press Coverage', 'nooz' ), __( 'More press coverage ...', 'nooz' ) );
 		$post_id = wp_insert_post( array (
 			'post_content' => vsprintf( $format, $args ),

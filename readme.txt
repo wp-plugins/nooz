@@ -3,7 +3,7 @@ Contributors: mightydigital, farinspace
 Tags: press, news, media, press release, news coverage, media coverage, corporate, business
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 0.4.1
+Stable tag: 0.4.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ If you've downloaded the latest plugin files:
 3. Custom section for external press coverage
 
 == Changelog ==
+
+= 0.4.2 =
+* fixed broken link to press-coverage page
 
 = 0.4.1 =
 * fixed issue with news coverage display
