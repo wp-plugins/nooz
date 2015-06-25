@@ -1,0 +1,9 @@
+{% extends 'field.html' %}
+{% block field %}
+    <p>
+        {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
+        <a href="{{href}}" class="button">{{value}}</a>
+        {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
+    </p>
+    {% if description %}<p class="description">{{description}}</p>{% endif %}
+{% endblock %}

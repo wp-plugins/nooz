@@ -1,0 +1,12 @@
+<div class="wrap md-settings-page">
+    {% if title %}<h2 class="md-settings-page-title">{{title}}</h2>{% endif %}
+    {% if description %}<p class="md-settings-page-description">{{description}}</p>{% endif %}
+    {{settings_errors}}
+    <form method="post" action="options.php" enctype="multipart/form-data">
+    {{settings_fields}}
+        {% for item in items %}
+            {% include item.template with item only %}
+        {% endfor %}
+        {{submit}}
+    </form>
+</div>

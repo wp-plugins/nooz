@@ -1,0 +1,16 @@
+<tr
+    {% if id %} id="{{id}}"{% endif %}
+    {% if class %} class="{{class}}"{% endif %}
+    {% if style %} style="{{style}}"{% endif %}
+    {% if data %}{% for key, val in data %} data-{{key}}="{{val}}"{% endfor %}{% endif %}
+>
+    <th scope="row" class="md-label-col">
+        {% block label %}
+            {% if label %}<label for="{{name}}">{{label}}</label>{% endif %}
+            <div class="md-sidebar">{% block sidebar %}{{sidebar}}{% endblock %}</div>
+        {% endblock %}
+    </th>
+    <td class="md-field-col">
+        {% block field %}{% endblock %}
+    </td>
+</tr>

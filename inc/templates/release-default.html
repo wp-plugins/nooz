@@ -1,0 +1,17 @@
+<div class="nooz-release-content-wrapper nooz-content-wrapper">
+    {% if subheadline %}<h2 class="nooz-subheadline">{{subheadline}}</h2>{% endif %}
+    <div class="nooz-body-container nooz-container">
+        {% if location or date %}
+            <p class="nooz-location-datetime">
+                {% if location %}
+                    <span class="nooz-location">{{location}}</span>
+                    <span class="nooz-location-separator">&mdash;</span>
+                {% endif %}
+                <span class="nooz-datetime">{{date}}</span>
+            </p>
+        {% endif %}
+        <div class="nooz-body">{{content}}</div>
+        {% if boilerplate %}<div class="nooz-boilerplate">{{boilerplate}}</div>{% endif %}
+        {% if ending %}<p class="nooz-ending">{{ending}}</p>{% endif %}
+    </div>
+</div>

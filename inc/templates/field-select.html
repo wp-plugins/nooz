@@ -1,0 +1,21 @@
+{% extends 'field.html' %}
+{% block field %}
+    <p>
+        {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
+        {% if options %}
+            <select class="regular-text" id="{{name}}" name="{{name}}">
+                {% for option in options %}
+                    <option value="{{option.value}}"{% if option.value == value %} selected{% endif %}>
+                        {% if option.label %}
+                            {{option.label}}
+                        {% else %}
+                            {{option.value}}
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        {% endif %}
+        {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
+    </p>
+    {% if description %}<p class="description">{{description}}</p>{% endif %}
+{% endblock %}

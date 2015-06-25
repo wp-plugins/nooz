@@ -1,0 +1,17 @@
+body h2.md-tabs a.nav-tab {
+    border-bottom: 1px solid #ccc;
+    font-weight: 600;
+}
+body h2.md-tabs a.nav-tab-active {
+    border-bottom: 1px solid #f1f1f1;
+}
+.wrap h2.md-settings-page-title {
+    margin-bottom: 5px;
+}
+.md-tiny-field input {
+    width: 80px;
+}
+#md-release-slug input,
+#md-coverage-target input {
+    width: 200px;
+}
