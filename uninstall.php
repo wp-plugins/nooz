@@ -8,4 +8,5 @@ require_once(__DIR__ . '/inc/bootstrap.php');
 
 use MightyDev\WordPress\Plugin\NoozCore;
 
-NoozCore::get_instance()->uninstall();
+$nooz_core = new NoozCore();
+$nooz_core->uninstall();
