@@ -1,0 +1,19 @@
+<h2 class="nav-tab-wrapper md-tabs">
+    {% spaceless %}
+        {% for item in items %}
+            <a href="{{item.link}}" class="nav-tab{% if item.id == active %} nav-tab-active{% endif %}">{{item.title}}</a>
+        {% endfor %}
+    {% endspaceless %}
+</h2>
+<div class="md-tab-container">
+    {% for item in items %}
+        {% if item.id == active %}
+            <div class="nav-tab-{{item.id}} md-settings-tab-{{item.id}} md-settings-tab">
+                {% if item.description %}<p class="md-settings-page-description">{{item.description}}</p>{% endif %}
+                {% for item in item.items %}
+                    {% include item.template with item only %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

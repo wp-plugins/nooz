@@ -1,0 +1,7 @@
+<table class="form-table">
+    <tbody>
+        {% for item in items %}
+            {% include item.template with item only %}
+        {% endfor %}
+    </tbody>
+</table>

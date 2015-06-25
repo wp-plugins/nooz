@@ -1,11 +1,11 @@
 <?php
 
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit();
+if (! defined('WP_UNINSTALL_PLUGIN')) {
+    exit();
 }
 
-require_once( __DIR__ . '/inc/autoload.php' );
+require_once(__DIR__ . '/inc/bootstrap.php');
 
-$plugin = new \MightyDev\WordPress\Nooz;
+use MightyDev\WordPress\Plugin\NoozCore;
 
-$plugin->uninstall();
+NoozCore::get_instance()->uninstall();

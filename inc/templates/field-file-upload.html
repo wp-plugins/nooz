@@ -1,0 +1,15 @@
+{% extends 'field.html' %}
+{% block label %}
+    {% if label %}<label>{{label}}</label>{% endif %}
+{% endblock %}
+{% block field %}
+    <label for="{{name}}">
+        {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
+        <input id="{{name}}" name="{{name}}" type="file" />
+        <span class="button">{{value}}</span>
+        <span class="md-filename"></span>
+        {% if submit %}<input type="submit" value="{{submit}}" class="button button-primary" style="display:none;" name="submit">{% endif %}
+        {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
+    </label>
+    {% if description %}<p class="description">{{description}}</p>{% endif %}
+{% endblock %}

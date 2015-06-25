@@ -1,0 +1,9 @@
+{% extends 'field.html' %}
+{% block field %}
+    <p>
+        {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
+        <textarea class="large-text" name="{{name}}" cols="50" rows="10">{{value}}</textarea>
+        {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
+    </p>
+    {% if description %}<p class="description">{{description}}</p>{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% if groups or items %}
+    <div class="{{type}}-list-wrapper nooz-list-wrapper{% if css_classes %} {{css_classes}}{% endif %}">
+        {% if groups %}
+            {% for group in groups %}
+                <div class="nooz-group-container">
+                    <h3 class="nooz-group-title nooz-group">{{group.title}}</h3>
+                    {% if group.items %}
+                        <ul class="nooz-list {{type}}">
+                            {% for item in group.items %}
+                                <li class="nooz-item nooz-item-{{cycle(['odd', 'even'], loop.index0)}}">
+                                    <time class="nooz-datetime" datetime="{{item.datetime}}">{{item.datetime_formatted}}</time>
+                                    <p class="nooz-link"><a href="{{item.link}}"{% if item.target %} target="{{item.target}}"{% endif %}>{{item.title}}</a></p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <ul class="nooz-list {{type}}">
+                {% for item in items %}
+                    <li class="nooz-item nooz-item-{{cycle(['odd', 'even'], loop.index0)}}">
+                        <time class="nooz-datetime" datetime="{{item.datetime}}">{{item.datetime_formatted}}</time>
+                        <p class="nooz-link"><a href="{{item.link}}"{% if item.target %} target="{{item.target}}"{% endif %}>{{item.title}}</a></p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}
