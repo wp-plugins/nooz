@@ -3,7 +3,7 @@ Contributors: mightydigital, farinspace
 Tags: press, news, media, press release, news coverage, media coverage, corporate, business
 Requires at least: 3.5
 Tested up to: 4.2.2
-Stable tag: 0.5.2
+Stable tag: 0.5.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ If you've downloaded the latest plugin files:
 6. Press coverage settings
 
 == Changelog ==
+
+= 0.5.3 =
+* removed unused files in the core version which may have caused errors
 
 = 0.5.2 =
 * fixed issue with supporting files (proper version numbering)
