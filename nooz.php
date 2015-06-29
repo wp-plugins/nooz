@@ -6,7 +6,7 @@ Plugin URI: http://mightydev.com/nooz/
 Description: Simplified press release and media coverage management for business websites.
 Author: Mighty Digital
 Author URI: http://mightydigital.com
-Version: 0.5.3
+Version: 0.5.4
 */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -22,7 +22,7 @@ use \MightyDev\WordPress\Settings;
 $nooz_core = new NoozCore();
 $nooz_core->set_plugin_file( __FILE__ );
 $nooz_core->title( 'Nooz' );
-$nooz_core->version( '0.5.3' );
+$nooz_core->version( '0.5.4' );
 $nooz_core->wpalchemy_factory( new \WPAlchemy\Factory );
 $array_loader = new Twig_Loader_Array( array() );
 $file_loader = new Twig_Loader_Filesystem( array( __DIR__ . '/inc', __DIR__ . '/inc/templates' ) );
