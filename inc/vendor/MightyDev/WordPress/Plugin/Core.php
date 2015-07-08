@@ -91,4 +91,32 @@ abstract class Core {
         }
         return $ret;
     }
+
+    public function get_active_tab( $default = 'general', $var = 'tab' )
+    {
+        global $pagenow;
+        $active_tab = isset( $_GET[$var] ) ? $_GET[$var] : $default ;
+        if ( 'options.php' == $pagenow && wp_get_referer() ) {
+            $url = parse_url( wp_get_referer() );
+            $query = wp_parse_args( $url['query'] );
+            $active_tab = isset( $query[$var] ) ? $query[$var] : $active_tab ;
+        }
+        return $active_tab;
+    }
+
+    public function get_tab_url( $tab, $var = 'tab' )
+    {
+        $query = remove_query_arg( array( 'settings-updated', '_wpnonce' ) );
+        return esc_url( add_query_arg( $var, $tab, $query ) );
+    }
+
+    public function is_tab( $tab, $var = 'tab' )
+    {
+        return isset( $_GET[$var] ) && $tab == $_GET[$var];
+    }
+
+    public function is_nonce( $nonce, $var = '_wpnonce' )
+    {
+        return isset( $_REQUEST[$var] ) && wp_verify_nonce( $_REQUEST[$var] , $nonce );
+    }
 }

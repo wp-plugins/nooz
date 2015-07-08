@@ -1,10 +1,10 @@
 <?php
 
-if (! defined('WP_UNINSTALL_PLUGIN')) {
+if (! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
     exit();
 }
 
-require_once(__DIR__ . '/inc/autoload.php');
+require_once( __DIR__ . '/inc/autoload.php' );
 
 use MightyDev\WordPress\Plugin\NoozCore;
 

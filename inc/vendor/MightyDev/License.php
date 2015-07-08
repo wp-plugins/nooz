@@ -4,26 +4,44 @@ namespace MightyDev;
 
 class License
 {
-    protected $storage;
     protected $key;
     protected $api_url;
     protected $item_name;
     protected $response;
 
-    public function __construct($storage, $item_name, $api_url, $key = null)
+    public function __construct( $item_name, $api_url, $key = NULL )
     {
-        $this->storage = $storage;
-        $this->item_name = $item_name;
-        $this->api_url = $api_url;
-        $this->setKey($key);
+        $this->set_name( $item_name );
+        $this->set_api_url( $api_url );
+        $this->set_key($key);
     }
 
-    public function setKey($key)
+    public function set_name( $name )
+    {
+        $this->item_name = $name;
+    }
+
+    public function get_name()
+    {
+        return $this->item_name;
+    }
+
+    public function set_api_url( $api_url )
+    {
+        $this->api_url = $api_url;
+    }
+
+    public function get_api_url()
+    {
+        return $this->api_url;
+    }
+
+    public function set_key( $key )
     {
         $this->key = $key;
     }
 
-    public function getKey()
+    public function get_key()
     {
         return $this->key;
     }
@@ -32,84 +50,75 @@ class License
     {
         if (isset($this->response->error)) {
             // bad key
-            if ('missing' == $this->response->error) {
+            if ( 'missing' == $this->response->error) {
                 return 'missing';
             // expired
-            } else if ('expired' == $this->response->error) {
+            } else if ( 'expired' == $this->response->error) {
                 return 'expired';
-            } else if ('no_activations_left' == $this->response->error) {
+            } else if ( 'no_activations_left' == $this->response->error) {
                 return 'full';
             }
         }
         return 'unknown';
     }
 
-    public function activate($key = null)
+    public function activate( $key = NULL )
     {
-        if ($this->storage->get('license_activated')) {
-            var_dump($this->storage->get('activate_license_response', array()));exit;
-            $this->response = $this->storage->get('activate_license_response', array());
-            return true;
-        }
-        $this->response = $this->req('activate_license', $key);
-        if (false !== $this->response) {
-            if (isset($this->response->expires)) {
-                $this->setExpirationDate($this->response->expires);
+        $this->response = $this->req( 'activate_license', $key );
+        if ( FALSE !== $this->response ) {
+            if ( isset( $this->response->expires ) ) {
+                $this->set_expiration_date( $this->response->expires );
             }
-            if ('valid' == $this->response->license) {
-                $this->storage->set('activate_license_response', $this->response);
-                $this->storage->set('license_activated', 1);
-                return true;
+            if ( 'valid' == $this->response->license ) {
+                update_option( 'mdnooz_license_response', $this->response );
+                update_option( 'mdnooz_license_activated', date( 'Y-m-d' ) );
+                return TRUE;
             }
         }
-        return false;
+        return FALSE;
     }
 
-    public function deactivate($key = null)
+    public function deactivate( $key = NULL )
     {
-        $this->response = $this->req('deactivate_license', $key);
-        if (false !== $this->response && 'deactivated' == $this->response->license) {
-            $this->storage->delete('activate_license_response');
-            $this->storage->delete('license_activated');
-            return true;
+        $this->response = $this->req( 'deactivate_license', $key );
+        if ( FALSE !== $this->response && 'deactivated' == $this->response->license ) {
+            delete_option( 'mdnooz_license_response' );
+            delete_option( 'mdnooz_license_activated' );
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
-    public function isValid()
+    public function is_valid( $key = NULL )
     {
-        $data = $this->req('check_license');
-        if (false !== $data && 'valid' == $data->license) {
-            return true;
-        }
-        return false;
+        $response = $this->req( 'check_license', $key );
+        return FALSE !== $response && 'valid' == $response->license;
     }
 
-    protected function setExpirationDate($expire_date)
+    protected function set_expiration_date( $expire_date )
     {
-        update_option($this->prefix . '_license_expiration_date', strtotime($expire_date));
+        update_option( 'mdnooz_license_expiration', strtotime( $expire_date ) );
     }
 
-    public function getExpirationDate()
+    public function get_expiration_date()
     {
-        return get_option($this->id . '_license_expiration_date');
+        return get_option( 'mdnooz_license_expiration' );
     }
 
-    protected function req($action, $key = null)
+    protected function req( $action, $key = NULL )
     {
-        $key = isset($key) ? $key : $this->getKey();
-        if ($key) {
+        $key = isset( $key ) ? $key : $this->get_key();
+        if ( $key ) {
             $params = array(
                 'edd_action' => $action,
                 'license' => $key,
-                'item_name' => urlencode($this->item_name),
+                'item_name' => urlencode( $this->get_name() ),
             );
-            $response = wp_remote_get(add_query_arg($params, $this->api_url), array('timeout' => 15, 'sslverify' => false));
-            //var_dump($response);
-            if (!is_wp_error($response)) {
+            $response = wp_remote_get( add_query_arg( $params, $this->get_api_url() ), array( 'timeout' => 15, 'sslverify' => FALSE ) );
+            if ( ! is_wp_error( $response ) ) {
                 return json_decode(wp_remote_retrieve_body($response));
             }
         }
-        return false;
+        return FALSE;
     }
 }
