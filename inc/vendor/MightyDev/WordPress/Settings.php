@@ -57,24 +57,32 @@ class Settings
         return $config['items'];
     }
 
-    public function get($id)
+    public function get( $id )
     {
         if ( isset( $this->registered[$id] ) ) {
             return $this->registered[$id];
         }
-        return false;
+        return NULL;
     }
 
-    public function get_active_tab( $var, $default = null )
+    public function set( $id, array $vars )
     {
-        global $pagenow;
-        $active_tab = isset( $_GET[$var] ) ? $_GET[$var] : $default ;
-        if ( 'options.php' == $pagenow && wp_get_referer() ) {
-            $url = parse_url( wp_get_referer() );
-            $query = wp_parse_args( $url['query'] );
-            $active_tab = isset( $query[$var] ) ? $query[$var] : $active_tab ;
+        if ( isset( $this->registered[$id] ) ) {
+            $this->registered[$id] = $vars;
+            return $this->registered[$id];
         }
-        return $active_tab;
+        return NULL;
+    }
+
+    public function update( $id, array $vars )
+    {
+        if ( isset( $this->registered[$id] ) ) {
+            foreach( $vars as $key => $value ) {
+                $this->registered[$id][$key] = $value;
+            }
+            return $this->registered[$id];
+        }
+        return NULL;
     }
 
     public function get_submit_button( $text = null )

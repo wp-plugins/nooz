@@ -6,7 +6,12 @@ class NoozCore extends Core
 {
     protected $release_post_type = 'nooz_release';
     protected $coverage_post_type = 'nooz_coverage';
-    private $wpalchemy_factory;
+    protected $wpalchemy_factory;
+
+    public function __construct( $plugin_file )
+    {
+        $this->set_plugin_file( $plugin_file );
+    }
 
     public function set_default_options()
     {
@@ -248,7 +253,7 @@ class NoozCore extends Core
 
     public function _config_admin_menus()
     {
-        $active_tab = $this->settings->get_active_tab( 'tab', 'general' );
+        $active_tab = $this->get_active_tab();
         switch( $active_tab ) {
             case 'coverage':
                 register_setting( 'settings', 'mdnooz_coverage_target' );
@@ -281,7 +286,7 @@ class NoozCore extends Core
             'id' => 'general',
             'title' => _x( 'List', 'list of items', 'mdnooz' ),
             'description' => __( 'Default settings for the main press release and coverage list page.', 'mdnooz' ),
-            'link' => esc_url( add_query_arg( 'tab', 'general', remove_query_arg( 'settings-updated' ) ) ),
+            'link' => $this->get_tab_url( 'general' ),
         ) );
         $this->settings->register( 'general_default_section', 'general_tab', array(
             'template' => 'fields.html',
@@ -324,7 +329,7 @@ class NoozCore extends Core
         $this->settings->register( 'release_tab', 'tabs', array(
             'id' => 'release',
             'title' => __( 'Press Release', 'mdnooz' ),
-            'link' => esc_url( add_query_arg( 'tab', 'release', remove_query_arg( 'settings-updated' ) ) ),
+            'link' => $this->get_tab_url( 'release' ),
         ) );
         $this->settings->register( 'release_default_section', 'release_tab', array(
             'template' => 'fields.html',
@@ -373,7 +378,7 @@ class NoozCore extends Core
         $this->settings->register( 'coverage_tab', 'tabs', array(
             'id' => 'coverage',
             'title' => __( 'Press Coverage', 'mdnooz' ),
-            'link' => esc_url( add_query_arg( 'tab', 'coverage', remove_query_arg( 'settings-updated' ) ) ),
+            'link' => $this->get_tab_url( 'coverage' ),
         ) );
         $this->settings->register( 'coverage_default_section', 'coverage_tab', array(
             'template' => 'fields.html',
