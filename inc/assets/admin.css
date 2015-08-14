@@ -15,3 +15,21 @@ body h2.md-tabs a.nav-tab-active {
 #md-coverage-target input {
     width: 200px;
 }
+#wpalchemy-content-apt {
+    margin-top: 20px;
+}
+.wpalchemy-meta input[type="text"] {
+    width: 100%;
+}
+.wpalchemy-field label {
+    font-weight: bold;
+}
+.wpalchemy-field label span {
+    color: #999;
+    font-weight: normal;
+}
+.wpalchemy-field p {
+    color: #999;
+    font-size: 0.9em;
+    margin-top: 0;
+}

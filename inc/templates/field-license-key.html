@@ -3,7 +3,7 @@
     <p>
         {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
         <input class="regular-text" type="text" id="{{name}}" name="{{name}}" value="{{value}}"{% if placeholder %} placeholder="{{placeholder}}{% endif %}" />
-        {% if submit %}<input type="submit" value="{{submit}}" class="button button-primary" name="submit">{% endif %}
+        {% if submit %}<input type="submit" value="{{submit}}" class="button {{submit_class}}" name="{{submit_name|default('submit')}}" />{% endif %}
         {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
     </p>
     {% if description %}<p class="description">{{description}}</p>{% endif %}

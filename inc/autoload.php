@@ -1,16 +1,22 @@
 <?php
 
+use \Symfony\Component\ClassLoader\Psr4ClassLoader;
+
 if ( ! class_exists( '\Symfony\Component\ClassLoader\Psr4ClassLoader' ) ) {
-    require_once( __DIR__ . '/vendor/Symfony/Component/ClassLoader/Psr4ClassLoader.php' );
+    require_once( dirname( __FILE__ ) . '/vendor/Symfony/Component/ClassLoader/Psr4ClassLoader.php' );
 }
-$loader = new \Symfony\Component\ClassLoader\Psr4ClassLoader();
-$loader->addPrefix( 'WPAlchemy\\', __DIR__ . '/vendor/WPAlchemy' );
-$loader->addPrefix( 'WPAlchemy\\Settings', __DIR__ . '/vendor/WPAlchemy' );
-$loader->addPrefix( 'MightyDev\\WordPress\\Plugin', __DIR__ );
+$loader = new Psr4ClassLoader();
+$loader->addPrefix( 'MightyDev', dirname( __FILE__ ) . '/vendor/MightyDev' );
+$loader->addPrefix( 'MightyDev\\Templating', dirname( __FILE__ ) . '/vendor/MightyDev/Templating' );
+$loader->addPrefix( 'MightyDev\\WordPress', dirname( __FILE__ ) . '/vendor/MightyDev/WordPress' );
+$loader->addPrefix( 'MightyDev\\WordPress\\Plugin', dirname( __FILE__ ) . '/vendor/MightyDev/WordPress/Plugin' );
+$loader->addPrefix( 'MightyDev\\WordPress\\Plugin', dirname( __FILE__ ) );
+$loader->addPrefix( 'WPAlchemy', dirname( __FILE__ ) . '/vendor/WPAlchemy' );
 $loader->register();
-require_once( __DIR__ . '/vendor/MightyDev/autoload.php' );
 if ( ! class_exists( '\Twig_Autoloader' ) ) {
-    require_once( __DIR__ . '/vendor/Twig/Autoloader.php' );
+    require_once( dirname( __FILE__ ) . '/vendor/Twig/Autoloader.php' );
     Twig_Autoloader::register();
 }
-require_once(__DIR__ . '/vendor/WPAlchemy/helpers.php');
+if ( ! class_exists( '\WPAlchemy_MetaBox' ) ) {
+    require_once dirname( __FILE__ ) . '/vendor/WPAlchemy/MetaBox.php';
+}

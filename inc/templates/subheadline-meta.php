@@ -1,24 +1,3 @@
-<style>
-#wpalchemy-content-apt {
-	margin-top:20px;
-}
-.wpalchemy-meta input[type="text"] {
-	width:100%;
-}
-.wpalchemy-field label {
-	font-weight:bold;
-}
-.wpalchemy-field label span {
-	color:#999;
-	font-weight:normal;
-}
-.wpalchemy-field p {
-	margin-top:0;
-	color:#999;
-	font-size:0.9em;
-}
-</style>
-
 <div class="wpalchemy-meta">
 	<div class="wpalchemy-field">
 		<?php $mb->the_field('subheadline'); ?>

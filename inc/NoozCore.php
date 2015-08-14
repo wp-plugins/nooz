@@ -2,11 +2,13 @@
 
 namespace MightyDev\WordPress\Plugin;
 
+use MightyDev\WordPress\AdminHelper;
+
 class NoozCore extends Core
 {
     protected $release_post_type = 'nooz_release';
     protected $coverage_post_type = 'nooz_coverage';
-    protected $wpalchemy_factory;
+    protected $admin_helper;
 
     public function __construct( $plugin_file )
     {
@@ -26,15 +28,13 @@ class NoozCore extends Core
             // todo: provide a group by option, year or month ... list, group-year, group-month
             'mdnooz_shortcode_display' => 'list',
             'mdnooz_shortcode_date_format' => 'M j, Y',
+            'mdnooz_shortcode_use_excerpt' => 'on',
         ) );
     }
 
-    public function wpalchemy_factory( \WPAlchemy\Factory $wpalchemy_factory = null )
+    public function set_admin_helper( AdminHelper $admin_helper )
     {
-        if ( NULL !== $wpalchemy_factory ) {
-            $this->wpalchemy_factory = $wpalchemy_factory;
-        }
-        return $this->wpalchemy_factory;
+        $this->admin_helper = $admin_helper;
     }
 
     public function current_admin_colors()
@@ -127,18 +127,28 @@ class NoozCore extends Core
         $this->init_default_pages();
         $this->init_content_filter();
         $this->init_shortcodes();
-        $this->init_admin_styles_and_scripts();
+        add_action( 'admin_enqueue_scripts', array( $this, '_admin_styles_and_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, '_front_styles_and_scripts' ) );
+        // runs once on clean install or after an uninstall
+        add_action( 'init', array ( $this, '_installed' ) );
     }
 
-    // perhaps each init should be a class .. NoozShortcode, NoozContentFilter, NoozAdminMenu, NoozCustomPostType, NoozDefaultPages
-    public function init_admin_styles_and_scripts()
+    public function _installed()
     {
-        add_action( 'admin_enqueue_scripts', array( $this, '_admin_styles_and_scripts' ) );
+        if ( FALSE == get_option( 'mdnooz_installed' ) ) {
+            flush_rewrite_rules();
+            update_option( 'mdnooz_installed', TRUE );
+        }
     }
 
     public function _admin_styles_and_scripts()
     {
-        wp_enqueue_style( 'mdnooz-admin', plugins_url( 'inc/admin.css', $this->plugin_file ), array(), $this->version() );
+        wp_enqueue_style( 'mdnooz-admin', plugins_url( 'inc/assets/admin.css', $this->plugin_file ), array(), $this->version() );
+    }
+
+    public function _front_styles_and_scripts()
+    {
+        wp_enqueue_style( 'mdnooz-front', plugins_url( 'inc/assets/front.css', $this->get_plugin_file() ), array(), $this->version() );
     }
 
     public function init_cpt()
@@ -170,7 +180,8 @@ class NoozCore extends Core
             } else {
                 $url = admin_url( 'edit.php?post_status=publish&post_type=page&' . $option . '=' );
                 $message = sprintf( __( 'Create default press pages? Yes, <a href="%s">create pages</a>. No, <a href="%s">dismiss</a>.', 'mdnooz' ), $url . 'publish', $url . 'dismiss' );
-                $this->wpalchemy_factory()->createNotice( $message, 'update-nag', 'edit_pages' );
+                $notice = $this->admin_helper->create_notice( $message, 'update-nag', 'edit_pages' );
+                $notice->register();
             }
         }
         return $option_val;
@@ -269,6 +280,7 @@ class NoozCore extends Core
                 register_setting( 'settings', 'mdnooz_shortcode_count' );
                 register_setting( 'settings', 'mdnooz_shortcode_date_format' );
                 register_setting( 'settings', 'mdnooz_shortcode_display' );
+                register_setting( 'settings', 'mdnooz_shortcode_use_excerpt' );
                 break;
         }
         $this->settings->register( 'settings', null, array(
@@ -325,7 +337,14 @@ class NoozCore extends Core
             'value' => get_option( 'mdnooz_shortcode_date_format' ),
             'placeholder' => $this->get_default_date_format(),
         ) );
-
+        $this->settings->register( 'shortcode_use_excerpt_field', 'general_default_section', array(
+            'template' => 'field-checkbox.html',
+            'name' => 'mdnooz_shortcode_use_excerpt',
+            'label' => __( 'Display Excerpts', 'mdnooz' ),
+            'after_field' => __( 'Enable press release and coverage excerpts.', 'mdnooz' ),
+            'description' => __( 'An excerpt will only be used if available for the specific press release or coverage.', 'mdnooz' ),
+            'checked' => 'on' == get_option( 'mdnooz_shortcode_use_excerpt' ),
+        ) );
         $this->settings->register( 'release_tab', 'tabs', array(
             'id' => 'release',
             'title' => __( 'Press Release', 'mdnooz' ),
@@ -405,7 +424,7 @@ class NoozCore extends Core
         array_splice( $submenu[$menu_slug], 1, 0, array( array_pop( $submenu[$menu_slug] ) ) );
         $add_new_coverage_text = __( 'Add New Coverage', 'mdnooz' );
         add_submenu_page( $parent_menu_slug, $add_new_coverage_text, $add_new_coverage_text, 'edit_posts', 'post-new.php?post_type=' . $this->coverage_post_type );
-        \WPAlchemy\Settings\setMenuPosition( 'nooz', '99.0100' );
+        $this->admin_helper->set_menu_position( 'nooz', '99.0100' );
         $title = _x( 'Settings', 'Admin settings page', 'mdnooz' );
         add_submenu_page( $parent_menu_slug, $title, $title, 'manage_options', $menu_slug, array( $this, '_render_settings_page' ) );
     }
@@ -443,7 +462,7 @@ class NoozCore extends Core
             'show_in_menu'       => $menu_slug,
             'show_in_admin_bar'  => true,
             'rewrite'            => array( 'slug' => get_option( 'mdnooz_release_slug' ), 'with_front' => false ),
-            'supports'           => array( 'title', 'editor', 'author', 'revisions' )
+            'supports'           => array( 'title', 'editor', 'excerpt', 'author', 'revisions' )
         );
         register_post_type( $this->release_post_type, $args );
 
@@ -466,7 +485,7 @@ class NoozCore extends Core
             'show_in_menu'       => $menu_slug,
             'show_in_admin_bar'  => true,
             'rewrite'            => false,
-            'supports'           => array( 'title', 'revisions' )
+            'supports'           => array( 'title', 'excerpt', 'revisions' )
         );
         register_post_type( $this->coverage_post_type, $args );
     }
@@ -478,7 +497,7 @@ class NoozCore extends Core
             'lock' => 'after_post_title',
             'hide_title' => true
         );
-        $this->wpalchemy_factory()->createMetaBox( '_' . $this->release_post_type, 'Subheadline', __DIR__ . '/subheadline-meta.php', $options );
+        $this->admin_helper->create_meta_box( '_' . $this->release_post_type, 'Subheadline', dirname( __FILE__ ) . '/templates/subheadline-meta.php', $options );
     }
 
     public function create_coverage_metabox()
@@ -487,7 +506,7 @@ class NoozCore extends Core
             'types' => array( $this->coverage_post_type )
         );
         // todo: consider renaming _nooz to _nooz_coverage .. needs backward-compatibility consideration
-        $this->wpalchemy_factory()->createMetaBox( '_nooz', 'Details', __DIR__ . '/coverage-meta.php', $options );
+        $this->admin_helper->create_meta_box( '_nooz', 'Details', dirname( __FILE__ ) . '/templates/coverage-meta.php', $options );
     }
 
     public function _list_shortcode( $atts, $content = null, $tag = null )
@@ -504,6 +523,7 @@ class NoozCore extends Core
             'display' => get_option( 'mdnooz_shortcode_display' ), // list, group
             'target' => '',
             'type' => $tag, // release, coverage
+            'use_excerpt' => get_option( 'mdnooz_shortcode_use_excerpt' ),
         );
         $atts = shortcode_atts( $default_atts, $atts );
         $type = stristr( $atts['type'], 'coverage' ) ? $this->coverage_post_type : $this->release_post_type ;
@@ -522,11 +542,15 @@ class NoozCore extends Core
             foreach( $posts as $post ) {
                 $link = '';
                 $link_target = '';
+                $source = NULL;
                 if ( $this->coverage_post_type == $type ) {
                     $meta = get_post_meta( $post->ID, '_nooz', TRUE );
                     if( isset( $meta['link'] ) ) {
                         $link = $meta['link'];
                         $link_target = get_option( 'mdnooz_coverage_target' );
+                    }
+                    if ( isset( $meta['source'] ) ) {
+                        $source = $meta['source'];
                     }
                 } else { // if release post type
                     $link = get_permalink( $post->ID );
@@ -534,10 +558,14 @@ class NoozCore extends Core
                 $item = array(
                     'title' => get_the_title( $post->ID ),
                     'link' => $link,
+                    'source' => $source,
                     'target' => $atts['target'] ? $atts['target'] : $link_target,
                     'datetime' => get_the_time( 'Y-m-d', $post->ID ),
                     'datetime_formatted' => get_the_date( $atts['date_format'], $post->ID ),
                 );
+                if ( $this->is_truthy( $atts['use_excerpt'] ) ) {
+                    $item['excerpt'] = $post->post_excerpt;
+                }
                 if ( 'group' == $atts['display'] ) {
                     $year = mysql2date( 'Y', $post->post_date );
                     $month = mysql2date( 'n', $post->post_date );
@@ -554,6 +582,11 @@ class NoozCore extends Core
             }
         }
         return $data;
+    }
+
+    protected function is_truthy( $val )
+     {
+        return TRUE === $val || in_array( $val, array( 'on', 'yes', '1', 1, 'true', 'enable', 'enabled', 'ok' ) );
     }
 
     public function uninstall()

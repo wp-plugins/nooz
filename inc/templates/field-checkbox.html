@@ -2,7 +2,8 @@
 {% block field %}
     <p>
         {% if before_field %}<span class="md-before-field">{{before_field}}</span>{% endif %}
-        <input type="checkbox" id="{{name}}" name="{{name}}" value="{{value}}"{% if checked %} checked="checked"{% endif %}>
+        <input type="hidden" name="{{name}}" value="off">
+        <input type="checkbox" name="{{name}}" value="on"{% if checked %} checked="checked"{% endif %}>
         {% if after_field %}<span class="md-after-field">{{after_field}}</span>{% endif %}
     </p>
     {% if description %}<p class="description">{{description}}</p>{% endif %}

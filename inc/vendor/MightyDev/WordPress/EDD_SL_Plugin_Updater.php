@@ -303,6 +303,10 @@ class EDD_SL_Plugin_Updater {
             $request = false;
         }
 
+        // todo: write a test for this
+        // fixes Notice: Undefined index: plugin in wp-admin/includes/update.php on line 281 in wordpress v4.2.2
+        $request->plugin = $this->name;
+
         return $request;
     }
 

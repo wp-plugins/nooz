@@ -13,9 +13,13 @@ class Settings
         $this->relationships = array();
     }
 
-    // todo: type hint array ???
-    // register( $id, $obj );
-    // register( $id, $parent_id, $obj );
+    /**
+     * Registers options for a setting.
+     *
+     * @param string $id Setting name
+     * @param mixed $parent_id_or_arr Parent setting name or Array of options
+     * @param array $arr Array of options
+     */
     public function register($id, $parent_id_or_arr, array $arr = null)
     {
         if (empty($parent_id_or_arr) || is_string($parent_id_or_arr)) {
@@ -23,7 +27,7 @@ class Settings
         } else {
             $arr = $parent_id_or_arr;
         }
-        $this->registered[$id] = $arr;
+        $this->update( $id, $arr );
     }
 
     public function unregister($id)
@@ -46,7 +50,6 @@ class Settings
             if ( empty( $parent_id ) ) {
                 $config['items'][$id] = $this->registered[$id];
             } else {
-                // todo: what happens if parent doesnt exist
                 $node = &$this->find( $parent_id, $config );
                 $node['items'][$id] = $this->registered[$id];
             }
@@ -67,11 +70,8 @@ class Settings
 
     public function set( $id, array $vars )
     {
-        if ( isset( $this->registered[$id] ) ) {
-            $this->registered[$id] = $vars;
-            return $this->registered[$id];
-        }
-        return NULL;
+        $this->registered[$id] = $vars;
+        return $this->registered[$id];
     }
 
     public function update( $id, array $vars )
@@ -81,6 +81,8 @@ class Settings
                 $this->registered[$id][$key] = $value;
             }
             return $this->registered[$id];
+        } else  {
+            return $this->set( $id, $vars );
         }
         return NULL;
     }
